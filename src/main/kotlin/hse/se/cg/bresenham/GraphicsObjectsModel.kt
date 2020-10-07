@@ -2,32 +2,41 @@ package hse.se.cg.bresenham
 
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.awt.Color
 import java.awt.Point
 
 /**
  * Объект, управляющий всеми линиями для отображения
  */
-object GraphicsObjectsModel : Iterable<Line> {
+object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
     private val GENERATED_POINT_RANGE = 150..450
     private val LOG: Logger = LogManager.getLogger(GraphicsObjectsModel::class.java)
 
     private val drawingListeners = mutableListOf<DrawingListener>()
 
-    private val lines = generateOctants().toMutableList()
+    private val objects = generateOctants().toMutableList()
 
     var pendingBegin: Point? = null
         private set
+
     fun addPoint(p: Point) {
         LOG.debug("Add $p. Pending begin: $pendingBegin")
         val beginning = pendingBegin
         if (beginning == null) {
             pendingBegin = p
         } else {
-            lines += Line(beginning, p)
+            objects += GraphicalObject(Settings.color, Line(beginning, p))
             pendingBegin = null
         }
 
         fireEvent()
+    }
+
+    fun undo() {
+        if (pendingBegin == null) {
+            objects.removeLastOrNull()
+            fireEvent()
+        }
     }
 
     private fun fireEvent() {
@@ -36,19 +45,19 @@ object GraphicsObjectsModel : Iterable<Line> {
         }
     }
 
-    override fun iterator(): Iterator<Line> {
-        return lines.iterator()
+    override fun iterator(): Iterator<GraphicalObject> {
+        return objects.iterator()
     }
 
     fun clean() {
-        lines.clear()
+        objects.clear()
         fireEvent()
     }
 
     /**
      * Генерирует линии во всех октантах
      */
-    private fun generateOctants(): List<Line> {
+    private fun generateOctants(): List<GraphicalObject> {
         val lines = mutableListOf<Line>()
         val length = GENERATED_POINT_RANGE.last - GENERATED_POINT_RANGE.first
         val xStep = length / 2
@@ -61,7 +70,7 @@ object GraphicsObjectsModel : Iterable<Line> {
                 lines += Line(center, Point(x, y))
             }
         }
-        return lines
+        return lines.map { GraphicalObject(Settings.color, it) }
     }
 
     fun addDrawingListener(listener: DrawingListener) {
@@ -82,5 +91,15 @@ object GraphicsObjectsModel : Iterable<Line> {
                 field = value
                 fireEvent()
             }
+
+        var color: Color = Color.RED
+            set(value) {
+                field = value
+                fireEvent()
+            }
+
+        val testingColor: Color = Color.BLUE
     }
+
+    data class GraphicalObject(val color: Color, val drawable: Drawable)
 }
