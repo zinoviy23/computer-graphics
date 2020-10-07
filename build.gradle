@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'application'
+}
+
+group 'hse.se.cg'
+version '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClassName = "hse.se.cg.bresenham.MainKt"
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.apache.logging.log4j:log4j-api:2.4.1"
+    implementation "org.apache.logging.log4j:log4j-core:2.4.1"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
