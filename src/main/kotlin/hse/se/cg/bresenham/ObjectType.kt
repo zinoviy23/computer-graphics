@@ -13,6 +13,10 @@ enum class ObjectType(
     Circle(
         "окружность",
         { a, b -> Circle(a, b) }
+    ),
+    Ellipsis(
+        "овал",
+        { a, b -> Ellipsis(a, b) }
     );
 
     override fun toString(): String {

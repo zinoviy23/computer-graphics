@@ -60,12 +60,7 @@ class MainWindow : JFrame("Алгоритм Брезенхема") {
 
         val instrumentPanel = JPanel(FlowLayout(FlowLayout.LEFT))
         instrumentPanel.add(JLabel("Инструмент:"))
-        val instrumentTypeComboBox = JComboBox(
-            arrayOf(
-                ObjectType.Line,
-                ObjectType.Circle
-            )
-        )
+        val instrumentTypeComboBox = JComboBox(ObjectType.values())
         instrumentTypeComboBox.selectedItem = GraphicsObjectsModel.Settings.currentInstrument
         instrumentTypeComboBox.addActionListener {
             GraphicsObjectsModel.Settings.currentInstrument =
