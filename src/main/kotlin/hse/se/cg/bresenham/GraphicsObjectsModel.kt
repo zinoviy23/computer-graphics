@@ -6,7 +6,7 @@ import java.awt.Color
 import java.awt.Point
 
 /**
- * Объект, управляющий всеми линиями для отображения
+ * Объект, управляющий всеми объектами для отображения
  */
 object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
     private val GENERATED_POINT_RANGE = 150..450
@@ -25,7 +25,7 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
         if (beginning == null) {
             pendingBegin = p
         } else {
-            objects += GraphicalObject(Settings.color, Line(beginning, p))
+            objects += GraphicalObject(Settings.color, Settings.currentInstrument.createObject(beginning, p))
             pendingBegin = null
         }
 
@@ -93,6 +93,12 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
             }
 
         var color: Color = Color.RED
+            set(value) {
+                field = value
+                fireEvent()
+            }
+
+        var currentInstrument: ObjectType = ObjectType.Line
             set(value) {
                 field = value
                 fireEvent()

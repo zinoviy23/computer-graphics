@@ -64,7 +64,9 @@ class DrawingCanvas : JPanel() {
         val pendingPoint = GraphicsObjectsModel.pendingBegin ?: return
         println(pendingPoint)
         val currentMousePosition = currentMousePosition ?: return
-        Line(pendingPoint, currentMousePosition).draw(GraphicsObjectsModel.Settings.color, g, bresenhamModel)
+        GraphicsObjectsModel.Settings.currentInstrument
+            .createObject(pendingPoint, currentMousePosition)
+            .draw(GraphicsObjectsModel.Settings.color, g, bresenhamModel)
     }
 
     companion object {

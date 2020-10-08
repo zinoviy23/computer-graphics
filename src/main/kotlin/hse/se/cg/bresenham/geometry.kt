@@ -29,11 +29,38 @@ data class Line(val begin: Point, val end: Point) : Drawable {
     }
 }
 
+data class Circle(val center: Point, val radius: Int) : Drawable {
+    constructor(center: Point, other: Point) : this(center, other.distance(center).toInt())
+
+    override fun draw(color: Color, g: Graphics, b: BresenhamModel) {
+        g.color = color
+        b.circleAlgorithm.drawCircle(this)
+
+        if (GraphicsObjectsModel.Settings.isTestingMode) {
+            g.color = GraphicsObjectsModel.Settings.testingColor
+            g.drawCircle(shifted(SHIFT, SHIFT))
+        }
+    }
+
+    fun shifted(shiftX: Int, shiftY: Int): Circle {
+        return copy(center = center.shifted(shiftX, shiftY))
+    }
+}
+
 fun Point.shifted(shiftX: Int, shiftY: Int): Point =
     Point(x + shiftX, y + shiftY)
 
 private fun Graphics.drawLine(line: Line) {
     drawLine(line.begin.x, line.begin.y, line.end.x, line.end.y)
+}
+
+private fun Graphics.drawCircle(circle: Circle) {
+    drawOval(
+        circle.center.x - circle.radius,
+        circle.center.y - circle.radius,
+        circle.radius * 2,
+        circle.radius * 2
+    )
 }
 
 private const val SHIFT = 10
