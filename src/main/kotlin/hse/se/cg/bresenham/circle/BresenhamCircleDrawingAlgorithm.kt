@@ -4,7 +4,7 @@ import hse.se.cg.bresenham.Circle
 import java.awt.Point
 
 /**
- * Класс, реализующий алгоритм рисования окружности Брезенхема
+ * Класс, реализующий алгоритм рисования окружности Брезенхема по [статье](https://www.gatevidyalay.com/bresenham-circle-drawing-algorithm/)
  */
 class BresenhamCircleDrawingAlgorithm(private val pointDrawer: (x: Int, y: Int) -> Unit) {
     fun drawCircle(circle: Circle) {
