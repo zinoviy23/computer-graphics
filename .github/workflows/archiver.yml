@@ -42,8 +42,9 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ARCHIVE: `basename ${{ github.ref }}`_Aleksand_Izmaylov.zip`
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./`basename ${{ github.ref }}`_Aleksand_Izmaylov.zip
-        asset_name: `basename ${{ github.ref }}`_Aleksand_Izmaylov.zip
+        asset_path: ./${{ ARCHIVE }}
+        asset_name: ${{ ARCHIVE }}
         asset_content_type: application/zip
