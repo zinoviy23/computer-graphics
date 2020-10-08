@@ -6,7 +6,8 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ main ]
-    tags: "*"
+    tags:
+      - "Seminar*"
 
 jobs:
   build:
@@ -26,7 +27,7 @@ jobs:
     - name: Distribution
       run: ./gradlew distZip
     - name: Build archive
-      run: ./build_archive.sh ${{ github.ref }}
+      run: chmod +x build_archive.sh && ./build_archive.sh ${{ github.ref }}
     - name: Make realise
       uses: actions/create-release@v1
       env:

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-folder=Seminar2
+folder=$1
 
 mkdir $folder
 cp -r gradle $folder/gradle
