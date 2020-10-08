@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-folder=$1
+folder=`basename $1`
 
 mkdir $folder
 cp -r gradle $folder/gradle
