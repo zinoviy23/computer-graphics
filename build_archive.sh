@@ -12,4 +12,4 @@ cp gradlew.bat $folder/gradlew.bat
 cp settings.gradle $folder/settings.gradle
 cp -r build/distributions $folder/executable
 
-zip ${folder}_Aleksand_Izmaylov $folder -r
+zip ${folder}_Aleksandr_Izmaylov $folder -r

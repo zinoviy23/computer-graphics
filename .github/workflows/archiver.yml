@@ -38,13 +38,14 @@ jobs:
         body: Архив с заданием
         draft: false
         prerelease: false
+    - name: Set env
+      run: echo ::set-env name=TAG::${GITHUB_REF#refs/*/}
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ARCHIVE: `basename ${{ github.ref }}`_Aleksand_Izmaylov.zip`
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./${{ ARCHIVE }}
-        asset_name: ${{ ARCHIVE }}
+        asset_path: ./${{ env.TAG }}_Aleksandr_Izmaylov.zip
+        asset_name: ${{ env.TAG }}_Aleksandr_Izmaylov.zip
         asset_content_type: application/zip
