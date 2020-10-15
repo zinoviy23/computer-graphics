@@ -21,12 +21,16 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
 
     fun addPoint(p: Point) {
         LOG.debug("Add $p. Pending begin: $pendingBegin")
-        val beginning = pendingBegin
-        if (beginning == null) {
-            pendingBegin = p
+        if (Settings.currentInstrument.needTwoPoints) {
+            val beginning = pendingBegin
+            if (beginning == null) {
+                pendingBegin = p
+            } else {
+                objects += GraphicalObject(Settings.color, Settings.currentInstrument.createObject(beginning, p))
+                pendingBegin = null
+            }
         } else {
-            objects += GraphicalObject(Settings.color, Settings.currentInstrument.createObject(beginning, p))
-            pendingBegin = null
+            objects += GraphicalObject(Settings.color, Settings.currentInstrument.createObject(p, p))
         }
 
         fireEvent()
@@ -101,6 +105,7 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
         var currentInstrument: ObjectType = ObjectType.Line
             set(value) {
                 field = value
+                pendingBegin = null
                 fireEvent()
             }
 

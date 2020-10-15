@@ -11,6 +11,8 @@ import java.awt.Point
 class BresenhamEllipsisDrawingAlgorithm(private val pointDrawer: (x: Int, y: Int) -> Unit) {
     fun drawEllipsis(ellipsis: Ellipsis) {
         LOG.debug("draw ellipsis=$ellipsis")
+        if (ellipsis.xRadius == 0 || ellipsis.yRadius == 0) return
+
         firstPart(ellipsis)
         secondPart(ellipsis)
     }
@@ -27,7 +29,7 @@ class BresenhamEllipsisDrawingAlgorithm(private val pointDrawer: (x: Int, y: Int
         var stoppingX = twoBSquare * ellipsis.xRadius
         var stoppingY = 0
 
-        while (stoppingX > stoppingY) {
+        while (stoppingX >= stoppingY) {
             drawPoint(ellipsis.center, x, y)
             y++
             stoppingY += twoASquare
@@ -54,7 +56,7 @@ class BresenhamEllipsisDrawingAlgorithm(private val pointDrawer: (x: Int, y: Int
         var stoppingX = 0
         var stoppingY = twoASquare * ellipsis.yRadius
 
-        while (stoppingX < stoppingY) {
+        while (stoppingX <= stoppingY) {
             drawPoint(ellipsis.center, x, y)
             x++
             stoppingX += twoBSquare

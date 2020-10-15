@@ -5,10 +5,6 @@ import java.awt.Graphics
 import java.awt.Point
 import kotlin.math.abs
 
-interface Drawable {
-    fun draw(color: Color, g: Graphics, b: BresenhamModel)
-}
-
 data class Line(val begin: Point, val end: Point) : Drawable {
     val xDifference: Int
         get() = end.x - begin.x
@@ -19,13 +15,13 @@ data class Line(val begin: Point, val end: Point) : Drawable {
     fun shifted(shiftX: Int, shiftY: Int): Line =
         copy(begin = begin.shifted(shiftX, shiftY), end = end.shifted(shiftX, shiftY))
 
-    override fun draw(color: Color, g: Graphics, b: BresenhamModel) {
-        g.color = color
-        b.lineAlgorithm.drawLine(this)
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        drawingModel.graphics.color = color
+        drawingModel.drawingAlgorithmsModel.lineAlgorithm.drawLine(this)
 
         if (GraphicsObjectsModel.Settings.isTestingMode) {
-            g.color = GraphicsObjectsModel.Settings.testingColor
-            g.drawLine(shifted(SHIFT, SHIFT))
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+            drawingModel.graphics.drawLine(shifted(SHIFT, SHIFT))
         }
     }
 }
@@ -33,13 +29,13 @@ data class Line(val begin: Point, val end: Point) : Drawable {
 data class Circle(val center: Point, val radius: Int) : Drawable {
     constructor(center: Point, other: Point) : this(center, other.distance(center).toInt())
 
-    override fun draw(color: Color, g: Graphics, b: BresenhamModel) {
-        g.color = color
-        b.circleAlgorithm.drawCircle(this)
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        drawingModel.graphics.color = color
+        drawingModel.drawingAlgorithmsModel.circleAlgorithm.drawCircle(this)
 
         if (GraphicsObjectsModel.Settings.isTestingMode) {
-            g.color = GraphicsObjectsModel.Settings.testingColor
-            g.drawCircle(shifted(SHIFT, SHIFT))
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+            drawingModel.graphics.drawCircle(shifted(SHIFT, SHIFT))
         }
     }
 
@@ -49,13 +45,13 @@ data class Circle(val center: Point, val radius: Int) : Drawable {
 }
 
 data class Ellipsis(val center: Point, val xRadius: Int, val yRadius: Int) : Drawable {
-    override fun draw(color: Color, g: Graphics, b: BresenhamModel) {
-        g.color = color
-        b.ellipsisAlgorithm.drawEllipsis(this)
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        drawingModel.graphics.color = color
+        drawingModel.drawingAlgorithmsModel.ellipsisAlgorithm.drawEllipsis(this)
 
         if (GraphicsObjectsModel.Settings.isTestingMode) {
-            g.color = GraphicsObjectsModel.Settings.testingColor
-            g.drawOval(this.shifted(SHIFT, SHIFT))
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+            drawingModel.graphics.drawOval(this.shifted(SHIFT, SHIFT))
         }
     }
 
@@ -67,6 +63,18 @@ data class Ellipsis(val center: Point, val xRadius: Int, val yRadius: Int) : Dra
 
     fun shifted(xShift: Int, yShift: Int) =
         copy(center = center.shifted(xShift, yShift))
+}
+
+data class LineFloodFill(val center: Point): Drawable {
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        drawingModel.graphics.color = color
+        if (GraphicsObjectsModel.Settings.isTestingMode) return
+        drawingModel.drawingAlgorithmsModel
+            .scanlineFillAlgorithm
+            .fill(center, drawingModel.dimension) { x: Int, y: Int ->
+                drawingModel.getColor(x, y)
+            }
+    }
 }
 
 fun Point.shifted(shiftX: Int, shiftY: Int): Point =
