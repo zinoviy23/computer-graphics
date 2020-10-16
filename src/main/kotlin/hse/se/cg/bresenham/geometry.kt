@@ -3,7 +3,9 @@ package hse.se.cg.bresenham
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Point
+import kotlin.math.min
 import kotlin.math.abs
+import kotlin.math.max
 
 data class Line(val begin: Point, val end: Point) : Drawable {
     val xDifference: Int
@@ -11,6 +13,12 @@ data class Line(val begin: Point, val end: Point) : Drawable {
 
     val yDifference: Int
         get() = end.y - begin.y
+
+    val xRange: IntRange
+        get() = (min(begin.x, end.x)..max(begin.x, end.x))
+
+    val yRange: IntRange
+        get() = (min(begin.y, end.y)..max(begin.y, end.y))
 
     fun shifted(shiftX: Int, shiftY: Int): Line =
         copy(begin = begin.shifted(shiftX, shiftY), end = end.shifted(shiftX, shiftY))

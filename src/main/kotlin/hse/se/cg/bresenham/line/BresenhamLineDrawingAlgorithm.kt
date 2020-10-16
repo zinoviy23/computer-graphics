@@ -9,8 +9,6 @@ import kotlin.math.abs
  */
 class BresenhamLineDrawingAlgorithm(private val pointDrawer: (x: Int, y: Int) -> Unit) {
     fun drawLine(line: Line) {
-        LOG.debug("drawing line $line")
-
         var x = line.begin.x
         var y = line.begin.y
         var deltaX = abs(line.xDifference)

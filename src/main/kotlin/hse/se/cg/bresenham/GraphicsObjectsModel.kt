@@ -1,9 +1,12 @@
 package hse.se.cg.bresenham
 
+import hse.se.cg.bresenham.filters.DefaultFilter
+import hse.se.cg.bresenham.filters.DrawingFilter
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.Color
 import java.awt.Point
+import java.util.*
 
 /**
  * Объект, управляющий всеми объектами для отображения
@@ -16,13 +19,29 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
 
     private val objects = generateOctants().toMutableList()
 
+    private val pointConsumers: Queue<PointConsumer> = ArrayDeque()
+
     var pendingBegin: Point? = null
         private set
 
+    val currentPointConsumer: PointConsumer?
+        get() = pointConsumers.peek()
+
     fun addPoint(p: Point) {
         LOG.debug("Add $p. Pending begin: $pendingBegin")
+        val beginning = pendingBegin
+        val pointConsumer = pointConsumers.peek()
+        if (pointConsumer != null) {
+            if (beginning != null) {
+                pointConsumers.poll()
+                pointConsumer.consume(beginning, p)
+                pendingBegin = null
+            } else {
+                pendingBegin = p
+            }
+            return
+        }
         if (Settings.currentInstrument.needTwoPoints) {
-            val beginning = pendingBegin
             if (beginning == null) {
                 pendingBegin = p
             } else {
@@ -50,7 +69,9 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
     }
 
     override fun iterator(): Iterator<GraphicalObject> {
-        return objects.iterator()
+        return objects.asSequence()
+            .mapNotNull { it.applyFilter(Settings.currentDrawingFilter) }
+            .iterator()
     }
 
     fun clean() {
@@ -75,6 +96,10 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
             }
         }
         return lines.map { GraphicalObject(Settings.color, it) }
+    }
+
+    fun addPointConsumer(pointConsumer: PointConsumer) {
+        pointConsumers.add(pointConsumer)
     }
 
     fun addDrawingListener(listener: DrawingListener) {
@@ -110,7 +135,25 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
             }
 
         val testingColor: Color = Color.BLUE
+
+        var currentDrawingFilter: DrawingFilter = DefaultFilter
+            set(value) {
+                field = value
+                fireEvent()
+            }
     }
 
-    data class GraphicalObject(val color: Color, val drawable: Drawable)
+    data class GraphicalObject(val color: Color, val drawable: Drawable) {
+        fun applyFilter(drawingFilter: DrawingFilter): GraphicalObject? {
+            return drawingFilter.filter(drawable)?.let {
+                GraphicalObject(color, it)
+            }
+        }
+    }
+
+    interface PointConsumer {
+        fun consume(a: Point, b: Point)
+
+        fun drawPreview(a: Point, b: Point, g: DrawingModel)
+    }
 }

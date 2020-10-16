@@ -59,7 +59,6 @@ class DrawingCanvas : JPanel() {
     }
 
     override fun paint(g: Graphics) {
-        println("Paint")
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
         val graphics = image.graphics
 
@@ -83,6 +82,7 @@ class DrawingCanvas : JPanel() {
         }
 
         drawTestingObject(drawingModel)
+        GraphicsObjectsModel.Settings.currentDrawingFilter.drawPreview(drawingModel)
 
         g.drawImage(image, 0, 0, this)
         graphics.dispose()
@@ -91,6 +91,12 @@ class DrawingCanvas : JPanel() {
     private fun drawTestingObject(drawingModel: DrawingModel) {
         val pendingPoint = GraphicsObjectsModel.pendingBegin ?: return
         val currentMousePosition = currentMousePosition ?: return
+
+        val pointConsumer = GraphicsObjectsModel.currentPointConsumer
+        if (pointConsumer != null) {
+            pointConsumer.drawPreview(pendingPoint, currentMousePosition, drawingModel)
+            return
+        }
         GraphicsObjectsModel.Settings.currentInstrument
             .createObject(pendingPoint, currentMousePosition)
             .draw(GraphicsObjectsModel.Settings.color, drawingModel)

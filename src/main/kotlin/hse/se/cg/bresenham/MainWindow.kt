@@ -1,5 +1,6 @@
 package hse.se.cg.bresenham
 
+import hse.se.cg.bresenham.filters.ui.DrawingFilterType
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -68,6 +69,23 @@ class MainWindow : JFrame("Алгоритм Брезенхема") {
         }
         instrumentPanel.add(instrumentTypeComboBox)
         toolbar.add(instrumentPanel)
+
+        val filterPanel = JPanel(FlowLayout(FlowLayout.LEFT))
+        filterPanel.add(JLabel("Фильтр:"))
+        val filtersCombobox = JComboBox<Any>(DrawingFilterType.values())
+        filterPanel.add(filtersCombobox)
+        val filterSettingsPanel = JPanel(BorderLayout())
+        filterPanel.add(filterSettingsPanel)
+        filtersCombobox.addActionListener {
+            filterSettingsPanel.removeAll()
+
+            (filtersCombobox.selectedItem as DrawingFilterType).panel()?.let {
+                filterSettingsPanel.add(it, BorderLayout.CENTER)
+            }
+
+            filterPanel.revalidate()
+        }
+        toolbar.add(filterPanel)
 
         return toolbar
     }
