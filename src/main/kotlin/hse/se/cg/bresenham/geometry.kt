@@ -118,10 +118,15 @@ data class Bezier3Curve(val point0: Point, val point1: Point, val point2: Point,
     }
 }
 
-data class BezierCurve(val points: List<Point>): Drawable {
+data class BezierCurve(val points: List<Point>, val bothMethods: Boolean = false): Drawable {
     override fun draw(color: Color, drawingModel: DrawingModel) {
         drawingModel.graphics.color = color
         drawingModel.drawingAlgorithmsModel.bezierCurveDrawingAlgorithm.draw(points)
+
+        if (bothMethods) {
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+            drawingModel.drawingAlgorithmsModel.deCasteljauCurveDrawingAlgorithm.draw(points.map { it.shifted(10, 10) })
+        }
 
         if (GraphicsObjectsModel.Settings.isTestingMode) {
             drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor

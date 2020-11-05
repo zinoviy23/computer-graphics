@@ -69,7 +69,19 @@ enum class ObjectType(
                 BezierCurve(ArrayList(points)) to 0
             }
         }
-    ), CompoundBezierCurve3(
+    ),
+    BezierCurveWithDeCasteljau(
+        "кривая Безье двумя методами",
+        false,
+        false,
+        { points ->
+            if (points.size < 2) null to points.size
+            else {
+                BezierCurve(ArrayList(points), true) to 0
+            }
+        }
+    ),
+    CompoundBezierCurve3(
         "составная кривая Безье (3)",
         false,
         false,
