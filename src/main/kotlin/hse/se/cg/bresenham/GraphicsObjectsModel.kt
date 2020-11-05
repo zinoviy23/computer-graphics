@@ -88,6 +88,7 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
 
     fun clean() {
         objects.clear()
+        pendingPoints.clear()
         fireEvent()
     }
 

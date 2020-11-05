@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import javax.swing.*
 
-class MainWindow : JFrame("Алгоритм Брезенхема") {
+class MainWindow : JFrame("Компьютерная Графика. Кривые Безье. Семинар 4") {
     init {
         defaultCloseOperation = EXIT_ON_CLOSE
 
