@@ -1,6 +1,7 @@
 package hse.se.cg.bresenham.line
 
 import hse.se.cg.bresenham.Line
+import hse.se.cg.bresenham.math.sign
 import org.apache.logging.log4j.LogManager
 import kotlin.math.abs
 
@@ -41,12 +42,6 @@ class BresenhamLineDrawingAlgorithm(private val pointDrawer: (x: Int, y: Int) ->
             }
             e += 2 * deltaY
         }
-    }
-
-    private fun sign(n: Int) = when {
-        n == 0 -> 0
-        n < 0 -> -1
-        else -> 1
     }
 
     companion object {

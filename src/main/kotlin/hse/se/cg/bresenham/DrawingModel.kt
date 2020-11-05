@@ -17,4 +17,6 @@ class DrawingModel(
 
 interface Drawable {
     fun draw(color: Color, drawingModel: DrawingModel)
+
+    fun drawPreview(color: Color, drawingModel: DrawingModel) = draw(color, drawingModel)
 }

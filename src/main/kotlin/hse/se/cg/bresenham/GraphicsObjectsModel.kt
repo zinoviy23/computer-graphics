@@ -47,7 +47,7 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
             return
         }
 
-        val newObject = Settings.currentInstrument.createObject(beginning + p)
+        val (newObject, _) = Settings.currentInstrument.createObject(beginning + p)
         if (newObject != null) {
             objects += GraphicalObject(Settings.color, newObject)
             beginning.clear()
@@ -59,8 +59,9 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
     }
 
     fun finish() {
-        Settings.currentInstrument.createObject(pendingPoints)?.let {
-            objects += GraphicalObject(Settings.color, it)
+        val (newObject, left) = Settings.currentInstrument.createObject(pendingPoints)
+        if (newObject != null && left == 0) {
+            objects += GraphicalObject(Settings.color, newObject)
             pendingPoints.clear()
         }
         fireEvent()

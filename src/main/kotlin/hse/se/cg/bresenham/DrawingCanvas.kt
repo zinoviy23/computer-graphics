@@ -103,26 +103,24 @@ class DrawingCanvas : JPanel() {
             pointConsumer.drawPreview(pendingPoints[0], currentMousePosition, drawingModel)
             return
         }
-        val previewDrawable = GraphicsObjectsModel.Settings.currentInstrument
-            .createObject(pendingPoints + currentMousePosition)
-        if (previewDrawable != null) {
-            previewDrawable.draw(GraphicsObjectsModel.Settings.color, drawingModel)
-        } else {
-            for (point in pendingPoints) {
-                drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
-                drawingModel.graphics.fillOval(
-                    point.x - PREVIEW_POINT_RADIUS,
-                    point.y - PREVIEW_POINT_RADIUS,
-                    2 * PREVIEW_POINT_RADIUS,
-                    2 * PREVIEW_POINT_RADIUS
-                )
-            }
+        val pointsToDraw = pendingPoints + currentMousePosition
+        val (previewDrawable, pointsLeft) = GraphicsObjectsModel.Settings.currentInstrument
+            .createObject(pointsToDraw)
+        previewDrawable?.drawPreview(GraphicsObjectsModel.Settings.color, drawingModel)
+        for (point in pointsToDraw.takeLast(pointsLeft)) {
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+            drawingModel.graphics.fillOval(
+                point.x - PREVIEW_POINT_RADIUS,
+                point.y - PREVIEW_POINT_RADIUS,
+                2 * PREVIEW_POINT_RADIUS,
+                2 * PREVIEW_POINT_RADIUS
+            )
         }
     }
 
     companion object {
         private val MIN_SIZE = Dimension(640, 480)
         private val PREFERRED_SIZE = Dimension(1080, 720)
-        private const val PREVIEW_POINT_RADIUS = 10
+        private const val PREVIEW_POINT_RADIUS = 5
     }
 }

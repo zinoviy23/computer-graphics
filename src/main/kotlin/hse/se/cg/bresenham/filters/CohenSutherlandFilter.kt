@@ -4,6 +4,9 @@ import hse.se.cg.bresenham.Drawable
 import hse.se.cg.bresenham.DrawingModel
 import hse.se.cg.bresenham.GraphicsObjectsModel
 import hse.se.cg.bresenham.Line
+import hse.se.cg.bresenham.math.NumberOrInfinity
+import hse.se.cg.bresenham.math.div
+import hse.se.cg.bresenham.math.incline
 import java.awt.Point
 
 class CohenSutherlandFilter private constructor(
@@ -80,12 +83,6 @@ class CohenSutherlandFilter private constructor(
         return null
     }
 
-    private fun incline(a: Point, b: Point): NumberOrInfinity {
-        if (a.x - b.x == 0) return NumberOrInfinity.Infinity
-        if ((a.y - b.y) == 0) return NumberOrInfinity.Number.Zero
-        return NumberOrInfinity.Number.NonZeroNumber((a.y.toDouble() - b.y) / (a.x.toDouble() - b.x))
-    }
-
     private val Point.positionCode: Int
         get() {
             var code = 0
@@ -104,28 +101,5 @@ class CohenSutherlandFilter private constructor(
             lastFilter = CohenSutherlandFilter(point, width, height)
             return lastFilter!!
         }
-    }
-
-    private sealed class NumberOrInfinity {
-        interface NonZero
-
-        object Infinity : NumberOrInfinity(), NonZero
-        sealed class Number : NumberOrInfinity() {
-            abstract val number: Double
-
-            operator fun times(double: Double) = number * double
-
-            object Zero : Number() {
-                override val number: Double = 0.0
-            }
-
-            class NonZeroNumber(override val number: Double) : Number(), NonZero
-        }
-    }
-
-    private operator fun Double.div(number: NumberOrInfinity.NonZero) = when (number) {
-        is NumberOrInfinity.Infinity -> 0.0
-        is NumberOrInfinity.Number.NonZeroNumber -> this / number.number
-        else -> error("cannot be here")
     }
 }

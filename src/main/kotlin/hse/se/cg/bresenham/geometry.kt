@@ -105,6 +105,17 @@ data class Bezier3Curve(val point0: Point, val point1: Point, val point2: Point,
             drawingModel.graphics.drawLine(Line(point2, point3))
         }
     }
+
+    override fun drawPreview(color: Color, drawingModel: DrawingModel) {
+        super.drawPreview(color, drawingModel)
+
+        drawingModel.graphics.color = color
+
+        drawingModel.graphics.fillOval(point0.x - 2, point0.y - 2, 4, 4)
+        drawingModel.graphics.fillOval(point1.x - 2, point1.y - 2, 4, 4)
+        drawingModel.graphics.fillOval(point2.x - 2, point2.y - 2, 4, 4)
+        drawingModel.graphics.fillOval(point3.x - 2, point3.y - 2, 4, 4)
+    }
 }
 
 data class BezierCurve(val points: List<Point>): Drawable {
@@ -119,6 +130,29 @@ data class BezierCurve(val points: List<Point>): Drawable {
                 drawingModel.graphics.fillOval(points[i].x - 2, points[i].y - 2, 4, 4)
                 drawingModel.graphics.drawLine(Line(points[i - 1], points[i]))
             }
+        }
+    }
+
+    override fun drawPreview(color: Color, drawingModel: DrawingModel) {
+        super.drawPreview(color, drawingModel)
+
+        drawingModel.graphics.color = color
+        for (p in points) {
+            drawingModel.graphics.fillOval(p.x - 2, p.y - 2, 4, 4)
+        }
+    }
+}
+
+data class CompoundBezierCurve3(val curves: List<Bezier3Curve>): Drawable {
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        for (curve in curves) {
+            curve.draw(color, drawingModel)
+        }
+    }
+
+    override fun drawPreview(color: Color, drawingModel: DrawingModel) {
+        for (curve in curves) {
+            curve.drawPreview(color, drawingModel)
         }
     }
 }
