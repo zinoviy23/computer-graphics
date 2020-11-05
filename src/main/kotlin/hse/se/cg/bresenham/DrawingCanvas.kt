@@ -21,11 +21,17 @@ class DrawingCanvas : JPanel() {
 
         addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
-                GraphicsObjectsModel.addPoint(e.point)
+                if (!GraphicsObjectsModel.Settings.currentInstrument.fixedNumberOfPoints && e.button == MouseEvent.BUTTON3) {
+                    GraphicsObjectsModel.finish()
+                } else {
+                    GraphicsObjectsModel.addPoint(e.point)
+                }
             }
 
             override fun mouseReleased(e: MouseEvent) {
-                if (GraphicsObjectsModel.pendingBegin != null) {
+                if (GraphicsObjectsModel.pendingPoints.isNotEmpty() &&
+                    GraphicsObjectsModel.Settings.currentInstrument.addPointOnRelease
+                ) {
                     GraphicsObjectsModel.addPoint(e.point)
                 }
             }
@@ -89,21 +95,34 @@ class DrawingCanvas : JPanel() {
     }
 
     private fun drawTestingObject(drawingModel: DrawingModel) {
-        val pendingPoint = GraphicsObjectsModel.pendingBegin ?: return
+        val pendingPoints = GraphicsObjectsModel.pendingPoints.takeIf { it.isNotEmpty() } ?: return
         val currentMousePosition = currentMousePosition ?: return
 
         val pointConsumer = GraphicsObjectsModel.currentPointConsumer
-        if (pointConsumer != null) {
-            pointConsumer.drawPreview(pendingPoint, currentMousePosition, drawingModel)
+        if (pointConsumer != null && pendingPoints.size > 0) {
+            pointConsumer.drawPreview(pendingPoints[0], currentMousePosition, drawingModel)
             return
         }
-        GraphicsObjectsModel.Settings.currentInstrument
-            .createObject(pendingPoint, currentMousePosition)
-            .draw(GraphicsObjectsModel.Settings.color, drawingModel)
+        val previewDrawable = GraphicsObjectsModel.Settings.currentInstrument
+            .createObject(pendingPoints + currentMousePosition)
+        if (previewDrawable != null) {
+            previewDrawable.draw(GraphicsObjectsModel.Settings.color, drawingModel)
+        } else {
+            for (point in pendingPoints) {
+                drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+                drawingModel.graphics.fillOval(
+                    point.x - PREVIEW_POINT_RADIUS,
+                    point.y - PREVIEW_POINT_RADIUS,
+                    2 * PREVIEW_POINT_RADIUS,
+                    2 * PREVIEW_POINT_RADIUS
+                )
+            }
+        }
     }
 
     companion object {
         private val MIN_SIZE = Dimension(640, 480)
         private val PREFERRED_SIZE = Dimension(1080, 720)
+        private const val PREVIEW_POINT_RADIUS = 10
     }
 }

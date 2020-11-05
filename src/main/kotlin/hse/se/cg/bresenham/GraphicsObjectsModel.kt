@@ -21,42 +21,53 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
 
     private val pointConsumers: Queue<PointConsumer> = ArrayDeque()
 
-    var pendingBegin: Point? = null
-        private set
+    val pendingPoints: MutableList<Point> = mutableListOf()
 
     val currentPointConsumer: PointConsumer?
         get() = pointConsumers.peek()
 
     fun addPoint(p: Point) {
-        LOG.debug("Add $p. Pending begin: $pendingBegin")
-        val beginning = pendingBegin
+        val beginning = pendingPoints
         val pointConsumer = pointConsumers.peek()
         if (pointConsumer != null) {
-            if (beginning != null) {
+            if (beginning.isEmpty() && beginning.size > 0) {
                 pointConsumers.poll()
-                pointConsumer.consume(beginning, p)
-                pendingBegin = null
+                pointConsumer.consume(beginning[0], p)
+                beginning.clear()
             } else {
-                pendingBegin = p
+                beginning += p
             }
+            fireEvent()
             return
         }
-        if (Settings.currentInstrument.needTwoPoints) {
-            if (beginning == null) {
-                pendingBegin = p
-            } else {
-                objects += GraphicalObject(Settings.color, Settings.currentInstrument.createObject(beginning, p))
-                pendingBegin = null
-            }
+
+        if (!Settings.currentInstrument.fixedNumberOfPoints) {
+            pendingPoints += p
+            fireEvent()
+            return
+        }
+
+        val newObject = Settings.currentInstrument.createObject(beginning + p)
+        if (newObject != null) {
+            objects += GraphicalObject(Settings.color, newObject)
+            beginning.clear()
         } else {
-            objects += GraphicalObject(Settings.color, Settings.currentInstrument.createObject(p, p))
+            beginning += p
         }
 
         fireEvent()
     }
 
+    fun finish() {
+        Settings.currentInstrument.createObject(pendingPoints)?.let {
+            objects += GraphicalObject(Settings.color, it)
+            pendingPoints.clear()
+        }
+        fireEvent()
+    }
+
     fun undo() {
-        if (pendingBegin == null) {
+        if (pendingPoints.isEmpty()) {
             objects.removeLastOrNull()
             fireEvent()
         }
@@ -95,7 +106,13 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
                 lines += Line(center, Point(x, y))
             }
         }
-        return lines.map { GraphicalObject(Settings.color, it) }
+        return lines.map { GraphicalObject(Settings.color, it) } +
+                GraphicalObject(Settings.color, Bezier3Curve(
+                    Point(100, 100),
+                    Point(200, 300),
+                    Point(100, 200),
+                    Point(300, 400)
+                ))
     }
 
     fun addPointConsumer(pointConsumer: PointConsumer) {
@@ -130,7 +147,7 @@ object GraphicsObjectsModel : Iterable<GraphicsObjectsModel.GraphicalObject> {
         var currentInstrument: ObjectType = ObjectType.Line
             set(value) {
                 field = value
-                pendingBegin = null
+                pendingPoints.clear()
                 fireEvent()
             }
 

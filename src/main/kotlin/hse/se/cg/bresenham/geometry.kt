@@ -85,6 +85,44 @@ data class LineFloodFill(val center: Point): Drawable {
     }
 }
 
+data class Bezier3Curve(val point0: Point, val point1: Point, val point2: Point, val point3: Point): Drawable {
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        drawingModel.graphics.color = color
+        drawingModel.drawingAlgorithmsModel
+            .bezier3CurveDrawingAlgorithm
+            .draw(listOf(point0, point1, point2, point3))
+
+        if (GraphicsObjectsModel.Settings.isTestingMode) {
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+
+            drawingModel.graphics.fillOval(point0.x - 2, point0.y - 2, 4, 4)
+            drawingModel.graphics.fillOval(point1.x - 2, point1.y - 2, 4, 4)
+            drawingModel.graphics.fillOval(point2.x - 2, point2.y - 2, 4, 4)
+            drawingModel.graphics.fillOval(point3.x - 2, point3.y - 2, 4, 4)
+
+            drawingModel.graphics.drawLine(Line(point0, point1))
+            drawingModel.graphics.drawLine(Line(point1, point2))
+            drawingModel.graphics.drawLine(Line(point2, point3))
+        }
+    }
+}
+
+data class BezierCurve(val points: List<Point>): Drawable {
+    override fun draw(color: Color, drawingModel: DrawingModel) {
+        drawingModel.graphics.color = color
+        drawingModel.drawingAlgorithmsModel.bezierCurveDrawingAlgorithm.draw(points)
+
+        if (GraphicsObjectsModel.Settings.isTestingMode) {
+            drawingModel.graphics.color = GraphicsObjectsModel.Settings.testingColor
+            drawingModel.graphics.fillOval(points[0].x - 2, points[0].y - 2, 4, 4)
+            for (i in 1 until points.size) {
+                drawingModel.graphics.fillOval(points[i].x - 2, points[i].y - 2, 4, 4)
+                drawingModel.graphics.drawLine(Line(points[i - 1], points[i]))
+            }
+        }
+    }
+}
+
 fun Point.shifted(shiftX: Int, shiftY: Int): Point =
     Point(x + shiftX, y + shiftY)
 
