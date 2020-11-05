@@ -17,6 +17,8 @@ class DeCasteljauCurveDrawingAlgorithm(private val lineDrawingAlgorithm: Bresenh
             prev = resultPoint
             t += 0.04
         }
+
+        lineDrawingAlgorithm.drawLine(Line(prev, points.last()))
     }
 
     private fun resultPoint(points: List<Point>, t: Double): Point {
